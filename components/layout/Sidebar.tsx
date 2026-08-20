@@ -62,10 +62,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <h1 className="font-bold text-slate-900 text-base leading-tight tracking-tight">
+                <h1 className="font-bold text-slate-900 text-xl leading-tight tracking-tight">
                   MediReview AI
                 </h1>
-                <p className="text-[11px] text-slate-400 font-medium tracking-wide">
+                <p className="text-sm text-slate-400 font-medium tracking-wide">
                   Clinical Data Assistant
                 </p>
               </div>
@@ -154,7 +154,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Package className="w-3.5 h-3.5" />
             <span>샘플 데이터 인덱싱</span>
           </button>
-          <div className="text-xs text-slate-400 flex items-center justify-between">
+          <div className="text-base text-slate-400 flex items-center justify-between">
             <span>v1.0.0</span>
             <span>MediReview AI</span>
           </div>

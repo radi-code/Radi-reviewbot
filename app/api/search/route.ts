@@ -33,35 +33,42 @@ export async function POST(req: Request) {
     const results = await vectorStore.similaritySearchWithScore(query, 5);
 
     console.log(`[SEARCH] 쿼리: "${query}", 결과: ${results.length}건`);
+    console.log('[SEARCH] 점수:', results.map(([, s]) => s.toFixed(3)).join(', '));
 
-    // 2. 검색된 리뷰들을 하나의 문자열(context)로 합치기
-    const context = results
+    // 2. 유사도 낮은 결과 필터링 (임계값은 실측 기반으로 조정)
+    const SCORE_THRESHOLD = 0.35; // ← 실측값으로 교체
+    const filteredResults = results.filter(([, score]) => score >= SCORE_THRESHOLD);
+
+    console.log(`[SEARCH] 필터링 후: ${filteredResults.length}건`);
+
+    // 3. 검색된 리뷰들을 하나의 문자열(context)로 합치기
+    const context = filteredResults
       .map(([doc]) => doc.pageContent)
       .join('\n\n');
 
-    // 3. LLM 설정 (gpt-5-nano)
+    // 4. LLM 설정 (gpt-5-nano)
     const chat = new ChatOpenAI({
       model: 'gpt-5-nano',
       apiKey: process.env.OPENAI_API_KEY,
     });
 
-    // 4. 프롬프트 템플릿: system(역할 정의) + human(사용자 질문)
+    // 5. 프롬프트 템플릿: system(역할 정의) + human(사용자 질문)
     const prompt = ChatPromptTemplate.fromMessages([
       ['system', SYSTEM_TEMPLATE],
       ['human', '{input}'],
     ]);
 
-    // 5. LCEL 체인: 프롬프트 → LLM → 텍스트 추출
+    // 6. LCEL 체인: 프롬프트 → LLM → 텍스트 추출
     const chain = prompt.pipe(chat).pipe(new StringOutputParser());
 
-    // 6. 체인 실행: context(검색된 리뷰)와 input(질문)을 넣어 답변 생성
+    // 7. 체인 실행: context(검색된 리뷰)와 input(질문)을 넣어 답변 생성
     const answer = await chain.invoke({
       context,
       input: query,
     });
 
-    // 7. 출처 리뷰 포맷팅 (SourceCard용)
-    const formattedResults = results.map(([doc, score]) => ({
+    // 8. 출처 리뷰 포맷팅 (SourceCard용)
+    const formattedResults = filteredResults.map(([doc, score]) => ({
       content: doc.pageContent,
       metadata: {
         id: doc.metadata?.id,
@@ -74,9 +81,13 @@ export async function POST(req: Request) {
       score,
     }));
 
+
+    // LLM이 관련 리뷰 없음으로 판단하면 출처 카드도 숨김
+    const noResult = answer.includes('관련 리뷰를 찾지 못했습니다');
+
     return NextResponse.json({
       text: answer,
-      sources: formattedResults,
+      sources: noResult ? [] : formattedResults,
     });
   } catch (error: any) {
     console.error('[SEARCH ERROR]', error);

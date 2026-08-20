@@ -17,25 +17,25 @@ export const CURRENT_PRODUCT: ProductInfo = {
 export const PRESET_QUESTIONS: PresetQuestion[] = [
   {
     id: 'q1',
-    question: '"병원에서 잰 혈압이랑 차이가 많이 나나요?"',
+    question: '병원 측정값과 차이가 있나요?',
     category: '정확도 리뷰 분석',
     iconName: 'pulse',
   },
   {
     id: 'q2',
-    question: '"커프 착용이 어렵진 않나요?"',
+    question: '커프 착용은 편한가요?',
     category: '사용 편의성 리뷰 분석',
     iconName: 'user',
   },
   {
     id: 'q3',
-    question: '"어르신이 쓰기에 화면이 잘 보이나요?"',
+    question: '어르신이 쓰기에 화면이 잘 보이나요?',
     category: '디스플레이 가독성 리뷰 분석',
     iconName: 'eye',
   },
   {
     id: 'q4',
-    question: '"스마트폰 앱 연동은 잘 되나요?"',
+    question: '스마트폰 앱 연동은 잘 되나요?',
     category: '블루투스 연결 리뷰 분석',
     iconName: 'phone',
   },

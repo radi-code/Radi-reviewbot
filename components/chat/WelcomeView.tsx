@@ -37,7 +37,7 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({ onSelectQuestion }) =>
         오므론 HEM-7156T 리뷰 분석 챗봇에 오신 것을 환영합니다!
       </h1>
       <p className="text-sm sm:text-base text-slate-500 max-w-xl leading-relaxed mb-10">
-        상품에 대해 궁금한 점을 물어보세요. 수백 개의 실제 사용자 리뷰를 기반으로 객관적인 답변을 제공합니다.
+        상품에 대해 궁금한 점을 물어보세요. 리뷰 데이터를 기반으로 객관적인 답변을 제공합니다.
       </p>
 
       {/* 2x2 추천 질문 카드 그리드 */}
@@ -58,10 +58,10 @@ export const WelcomeView: React.FC<WelcomeViewProps> = ({ onSelectQuestion }) =>
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-800 group-hover:text-blue-700 transition-colors leading-snug">
+              <p className="text-base font-semibold text-slate-800 group-hover:text-blue-700 transition-colors leading-snug">
                 {item.question}
               </p>
-              <p className="text-xs text-slate-400 mt-1 font-normal">
+              <p className="text-sm text-slate-400 mt-1 font-normal">
                 {item.category}
               </p>
             </div>
