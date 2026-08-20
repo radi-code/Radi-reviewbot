@@ -67,9 +67,9 @@ OPENAI_API_KEY=
 ## 스크린샷
 
 ### 웰컴 화면
-<img src="docs/welcome.png" width="600" alt="웰컴 화면">
+<img src="docs/welcome.png" width="800" alt="웰컴 화면">
 
 ### 리뷰 기반 답변 + 출처 카드
-<img src="docs/chat-sources.png" width="450" alt="답변 화면">
+<img src="docs/chat-sources.png" width="600" alt="답변 화면">
 
 무관한 질문에는 "관련 리뷰를 찾지 못했습니다"로 응답하며 출처 카드도 표시하지 않습니다.
