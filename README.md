@@ -50,12 +50,16 @@ npm install --legacy-peer-deps
 npm run dev
 ```
 
+
 `.env` (프로젝트 루트):
-    PINECONE_API_KEY=
-    PINECONE_HOST=
-    NEXT_PUBLIC_SUPABASE_URL=
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-    OPENAI_API_KEY=
+
+```
+PINECONE_API_KEY=
+PINECONE_HOST=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+OPENAI_API_KEY=
+```
 
 
 접속 후 사이드바 하단 "샘플 데이터 인덱싱" 클릭(최초 1회) → 질문 입력
@@ -63,9 +67,9 @@ npm run dev
 ## 스크린샷
 
 ### 웰컴 화면
-![웰컴 화면](docs/welcome.png)
+<img src="docs/welcome.png" width="600" alt="웰컴 화면">
 
 ### 리뷰 기반 답변 + 출처 카드
-![답변 화면](docs/chat-sources.png)
+<img src="docs/chat-sources.png" width="450" alt="답변 화면">
 
 무관한 질문에는 "관련 리뷰를 찾지 못했습니다"로 응답하며 출처 카드도 표시하지 않습니다.
