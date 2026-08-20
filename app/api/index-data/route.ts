@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
-import { Document } from '@langchain/core/documents';
-import { PineconeStore } from '@langchain/pinecone';
 import { supabase } from '@/lib/supabase';
 import { getPineconeIndex, getEmbeddings } from '@/lib/pinecone';
 
@@ -37,35 +35,45 @@ export async function POST() {
 
     if (supabaseError) {
       console.error('[INDEX] Supabase 에러:', supabaseError);
-      // Supabase 실패해도 Pinecone 인덱싱은 계속 진행
     } else {
       console.log('[INDEX] Supabase 저장 완료');
     }
 
-    // 3. LangChain Document 생성
-    const docs = records.map((record: any) => {
-      return new Document({
-        pageContent: `${record.title}\n${record.content}`,
-        metadata: {
-          id: record.id,
-          title: record.title,
-          content: record.content,
-          rating: parseInt(record.rating, 10),
-          author: record.author,
-          date: record.date,
-          verified_purchase: record.verified_purchase === 'true',
-        },
-      });
-    });
+    // 3. 텍스트 준비 (제목 + 내용)
+    const texts = records.map(
+      (record: any) => `${record.title}\n${record.content}`
+    );
 
-    // 4. OpenAI 임베딩 + PineconeStore로 인덱싱
-    const pineconeIndex = getPineconeIndex();
+    // 4. OpenAI로 임베딩 생성 (100건 한 번에)
     const embeddings = getEmbeddings();
+    console.log('[INDEX] 임베딩 생성 시작');
+    const vectors = await embeddings.embedDocuments(texts);
+    console.log(`[INDEX] 임베딩 생성 완료: ${vectors.length}건, 차원 ${vectors[0]?.length}`);
 
-    await PineconeStore.fromDocuments(docs, embeddings, {
-      pineconeIndex,
-      maxConcurrency: 5,
-    });
+    // 5. Pinecone 레코드 구성 (id + 벡터 + 메타데이터)
+    const pineconeRecords = records.map((record: any, i: number) => ({
+      id: String(record.id),
+      values: vectors[i],
+      metadata: {
+        text: texts[i], // 검색 시 pageContent로 복원되는 필드
+        title: record.title,
+        rating: parseInt(record.rating, 10),
+        author: record.author,
+        date: record.date,
+        verified_purchase: record.verified_purchase === 'true',
+      },
+    }));
+
+    console.log(`[INDEX] Pinecone 레코드 구성: ${pineconeRecords.length}건`);
+
+    // 6. Pinecone SDK로 직접 업로드 (50건씩 배치)
+    const index = getPineconeIndex();
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < pineconeRecords.length; i += BATCH_SIZE) {
+      const batch = pineconeRecords.slice(i, i + BATCH_SIZE);
+      await index.upsert({ records: batch });
+      console.log(`[INDEX] 배치 업로드: ${i + batch.length}/${pineconeRecords.length}`);
+    }
 
     console.log(`[INDEX] Pinecone 인덱싱 완료: ${records.length}건`);
 
